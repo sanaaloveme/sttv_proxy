@@ -12,31 +12,17 @@ app.get("/", (req, res) => {
     res.send("Proxy Server is Running 🚀");
 });
 
-app.get("/watch/:id", async (req, res) => {
+app.get("/watch/:id", (req, res) => {
 
     const id = req.params.id;
     const url = streams[id];
 
     if (!url) {
-        return res.status(404).send("Stream not found");
+        return res.status(404).send("Not found");
     }
 
-    try {
-        const response = await axios({
-            method: "GET",
-            url: url,
-            responseType: "stream"
-        });
-
-        res.setHeader("Content-Type", "video/mp2t");
-        res.setHeader("Content-Disposition", "inline");
-        res.setHeader("Cache-Control", "no-cache");
-
-        response.data.pipe(res);
-
-    } catch (err) {
-        res.status(500).send("Error loading stream");
-    }
+    // نرسل المستخدم مباشرة للمصدر
+    res.redirect(url);
 });
 
 const PORT = process.env.PORT || 3000;
