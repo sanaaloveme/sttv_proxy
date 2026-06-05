@@ -29,6 +29,8 @@ app.get("/watch/:id", async (req, res) => {
         });
 
         res.setHeader("Content-Type", "video/mp2t");
+        res.setHeader("Content-Disposition", "inline");
+        res.setHeader("Cache-Control", "no-cache");
 
         response.data.pipe(res);
 
