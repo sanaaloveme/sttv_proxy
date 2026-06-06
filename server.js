@@ -1,42 +1,75 @@
 const express = require("express");
-const axios = require("axios");
-const SECRET_TOKEN = "MY_SECRET_123";
+const crypto = require("crypto");
 
 const app = express();
 
-// مثال روابط (سنغيرها لاحقًا)
+// ===============================
+// 🔐 إعدادات الحماية
+// ===============================
+const SECRET_KEY = "MY_SECRET_123";
+const WINDOW = 30; // كل 30 ثانية
+
+// ===============================
+// 📺 روابط البث
+// ===============================
 const streams = {
     "123": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/44392.ts",
     "456": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/44393.ts",
     "789": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/44391.ts"
 };
 
+// ===============================
+// 🧠 توليد Token ديناميكي
+// ===============================
+function generateToken(id) {
+
+    const timeWindow = Math.floor(Date.now() / 1000 / WINDOW);
+
+    const data = `${id}:${timeWindow}:${SECRET_KEY}`;
+
+    return crypto
+        .createHash("sha256")
+        .update(data)
+        .digest("hex");
+}
+
+// ===============================
+// 🏠 Home
+// ===============================
 app.get("/", (req, res) => {
-    res.send("Proxy Server is Running 🚀");
+    res.send("🚀 IPTV Proxy Running with Dynamic Token");
 });
 
+// ===============================
+// 📺 Watch Route
+// ===============================
 app.get("/watch/:id", (req, res) => {
 
     const id = req.params.id;
     const token = req.query.token;
 
-    // 🔐 التحقق من التوكن
-    if (token !== SECRET_TOKEN) {
-        return res.status(403).send("Invalid Token ❌");
-    }
-
     const url = streams[id];
 
     if (!url) {
-        return res.status(404).send("Stream not found");
+        return res.status(404).send("Stream not found ❌");
     }
 
-    // 🚀 إعادة توجيه مباشرة للبث
+    // 🔐 تحقق من التوكن
+    const validToken = generateToken(id);
+
+    if (token !== validToken) {
+        return res.status(403).send("Invalid or expired token ❌");
+    }
+
+    // 🔁 إعادة توجيه للبث
     return res.redirect(url);
 });
 
+// ===============================
+// 🚀 تشغيل السيرفر
+// ===============================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log("Proxy running on port " + PORT);
+    console.log("✅ Server running on port " + PORT);
 });
