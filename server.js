@@ -19,6 +19,7 @@ const streams = {
     "456": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/44393.ts",
     "789": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/44390.ts"
     "890": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/683569.ts"
+    "901": "http://clubsmartlive.com:80/live/rYTCg4asp/twJ15X9a/683570.ts"
 };
 
 // ===============================
